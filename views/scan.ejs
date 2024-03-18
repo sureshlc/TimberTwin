@@ -1,0 +1,58 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Scan Barcode</title>
+    <script src="//cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
+</head>
+<body>
+    <h2>Scan a Barcode</h2>
+    <div id="interactive" class="viewport"></div>
+
+    <script>
+        Quagga.init({
+            inputStream: {
+                type : "LiveStream",
+                constraints: {
+                    width: 640,
+                    height: 480,
+                    facingMode: "environment" // or "user" for the front camera
+                },
+                target: document.querySelector('#interactive')
+            },
+            decoder: {
+                readers: ["code_128_reader"] // You can add more barcode formats here
+            }
+        }, function(err) {
+            if (err) {
+                console.error(err);
+                return
+            }
+            Quagga.start();
+        });
+
+        Quagga.onDetected(function(data) {
+            // Send the barcode data to the server
+            fetch('/api/addBarcode', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ code: data.codeResult.code }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                // Optionally, redirect or show a message
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+
+            Quagga.stop(); // Stop scanning
+            // Show some feedback here
+        });
+    </script>
+</body>
+</html>

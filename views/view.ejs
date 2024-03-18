@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Trees</title>
+</head>
+<body>
+    <h2>Tree Inventory</h2>
+    <div id="treeData">Loading...</div> <!-- Placeholder for tree data -->
+
+    <script>
+        // Fetch tree data from the API
+        fetch('/api/trees')
+            .then(response => response.json())
+            .then(trees => {
+                const container = document.getElementById('treeData');
+                // Clear the loading message
+                container.innerHTML = '';
+                // Create and append each tree's details to the container
+                trees.forEach(tree => {
+                    const div = document.createElement('div');
+                    div.innerHTML = `<p>Family Name: ${tree.familyname}</p>
+                                     <p>Species Name: ${tree.speciesname}</p>
+                                     <p>Quantity: ${tree.quantity}</p>
+                                     <p>Geolocation: Latitude ${tree.latitude}, Longitude ${tree.longitude}</p>`;
+                    container.appendChild(div);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching tree data:', error);
+                document.getElementById('treeData').innerHTML = 'Failed to load data.';
+            });
+    </script>
+
+    <button onclick="location.href='/'">Back to Dashboard</button>
+</body>
+</html>
